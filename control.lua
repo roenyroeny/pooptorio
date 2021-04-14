@@ -46,8 +46,20 @@ function Pooptorio.update_ui(player_index)
 end
 
 function Pooptorio.moveBowel(player_index)
-	
+
+	local digest = 0.1
+	Pooptorio.stomache = Pooptorio.stomache - digest;
+	Pooptorio.bowel = Pooptorio.bowel + digest;
+	-- compensate for negative stomache content
+	if Pooptorio.stomache < 0 then
+		Pooptorio.stomache = Pooptorio.stomache + Pooptorio.bowel;
+
+		--inflict starvation dammage here.
+
+		Pooptorio.stomache = 0;
+	end
 end
+
 function Pooptorio.on_tick(player)
 	if player.character then
 		player.character.health = player.character.health - 10.0
@@ -72,7 +84,7 @@ function Pooptorio.on_tick(player)
 		-- v.health = v.health - 3 
 	end
 
-
+	Pooptorio.moveBowel(1)
 	Pooptorio.update_ui(1)
 end
 
