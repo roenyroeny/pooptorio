@@ -1,7 +1,7 @@
 Pooptorio = {}
 Pooptorio.character = nil
 Pooptorio.need = 0
-Pooptorio.time = 0
+Pooptorio.tick = 0
 Pooptorio.listDump = {}
 
 function Pooptorio.on_console_chat()
@@ -19,23 +19,7 @@ function Pooptorio.on_console_chat()
 end
 
 function Pooptorio.on_tick()
-	if not Pooptorio.poopBar then
-		Pooptorio.poopBar = game.get_player(1).gui.top.add{ type="progressbar", name="greeg2", value=0.5 }
-	end
-	if not Pooptorio.character then
-		if game.get_player(1) and game.get_player(1).character then
-			Pooptorio.character = game.get_player(1).character
-		else
-			game.print("no character")
-			return
-		end
-	else
-		if not Pooptorio.character then
-			return
-		end
-		Pooptorio.character.health = Pooptorio.character.health - 10.0  
-		-- time = time + 1
-	end
+	Pooptorio.character.health = Pooptorio.character.health - 10.0
 
 	for k,v in ipairs(Pooptorio.listDump) do
 		v.health = v.health - 3 
@@ -62,7 +46,6 @@ function Pooptorio.on_player_used_capsule(e)
 			Pooptorio.need = Pooptorio.need + 1
 		end
 	end
-	--game.print("on_player_used_capsule")
 end
 function Pooptorio.on_player_respawned()
 	game.print("on_player_respawned")
@@ -78,15 +61,38 @@ script.on_event(defines.events.on_player_changed_position,
 
       if Pooptorio.canThePopeShitInTheWood(player) then
       	player.surface.create_entity{name="item-on-ground", position=player.position, stack={name="turd"}}
-
       	local poopcount = 1;
 	  end
   end
 )
 
+function GetCharacter()
+	if Pooptorio.character then
+		return true
+	else if not Pooptorio.character then
+		if game.get_player(1) and game.get_player(1).character then
+			Pooptorio.character = game.get_player(1).character
+			return true
+		else
+			game.print("no character")
+		end
+	end
+	return false
+end
+
+function Pooptorio.main()
+	if Pooptorio.GetCharacter() then
+		if tick % 6 = 0 then
+			Pooptorio.on_tick()
+		end
+	end
+	tick = tick + 1
+end
+
 script.on_event(defines.events.on_console_chat, Pooptorio.on_console_chat, nil)
 script.on_event(defines.events.on_player_used_capsule, function(event) Pooptorio.on_player_used_capsule(event) end, nil)
 script.on_event(defines.events.on_player_respawned, Pooptorio.on_player_respawned, nil)
 script.on_nth_tick(600, Pooptorio.on_tick)
+script.on_nth_tick(100, Pooptorio.main)
 
     --- game.player.gui.top.add{type="label", name="greeting2", caption="meowmeow"}
