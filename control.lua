@@ -1,4 +1,5 @@
 Pooptorio = {}
+Pooptorio.character = nil
 Pooptorio.need = 0
 Pooptorio.tick = 0
 Pooptorio.listDump = {}
@@ -18,14 +19,47 @@ function Pooptorio.on_console_chat(e)
 	}
 end
 
+function Pooptorio.update_ui()
+	if game.get_player(1).gui.left["poop"] == nil then
+		game.get_player(1).gui.left.add{type="progressbar", name="poop", value=0}
+	end
+	Pooptorio.needBar = game.get_player(1).gui.left["poop"]
+
+	Pooptorio.needBar.value = 0.5
+end
+
 function Pooptorio.on_tick(player)
 	if player.character then
 		player.character.health = player.character.health - 10.0
+function Pooptorio.update_ui()
+	if game.get_player(1).gui.left["poop"] == nil then
+		game.get_player(1).gui.left.add{type="progressbar", name="poop", value=0}
+	end
+	Pooptorio.needBar = game.get_player(1).gui.left["poop"]
+
+	Pooptorio.needBar.value = 0.5
+end
+
+function Pooptorio.on_tick()
+	if not Pooptorio.character then
+		if game.get_player(1) and game.get_player(1).character then
+			Pooptorio.character = game.get_player(1).character
+		else
+			game.print("no character")
+			return
+		end
+	else
+		if not Pooptorio.character then
+			return
+		end
+		Pooptorio.character.health = Pooptorio.character.health - 10.0  
+		-- time = time + 1
 	end
 
 	for k,v in ipairs(Pooptorio.listDump) do
 		v.health = v.health - 3
 	end
+	Pooptorio.update_ui()
 end
 
 function Pooptorio.canThePopeShitInTheWood(player)
