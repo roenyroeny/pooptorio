@@ -3,7 +3,7 @@ local sounds = require ("__base__.prototypes.entity.sounds")
 local turd = {
   name = "turd",
   type = "capsule",
-  icon = "__poop__/turd.png",
+  icon = "__pooptorio__/turd.png",
   icon_size = 32,
   subgroup = "raw-resource",
   order = "h[raw-fish][turd]",
@@ -35,10 +35,6 @@ local turd = {
               },
               {
                 type = "play-sound",
-                sound = sounds.eat_fish,
-              },
-              {
-                type = "script",
                 sound = sounds.eat_fish,
               },
             }
