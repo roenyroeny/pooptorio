@@ -50,7 +50,7 @@ function Pooptorio.on_tick()
 	for k,v in ipairs(Pooptorio.listDump) do
 		v.health = v.health - 3 
 	end
-	update_ui()
+	Pooptorio.update_ui()
 end
 
 function Pooptorio.canThePopeShitInTheWood(player)
