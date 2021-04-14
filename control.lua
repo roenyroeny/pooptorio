@@ -18,6 +18,19 @@ function Pooptorio.on_console_chat()
 	end
 end
 
+function Pooptorio.update_ui()
+	if game.get_player(1).gui.left["poop"] == nil then
+		game.get_player(1).gui.left.add{type="progressbar", name="poop", value=0}
+	end
+	Pooptorio.needBar = game.get_player(1).gui.left["poop"]
+
+
+
+
+
+	Pooptorio.needBar.value = 0.5
+end
+
 function Pooptorio.on_tick()
 	if not Pooptorio.poopBar then
 		Pooptorio.poopBar = game.get_player(1).gui.top.add{ type="progressbar", name="greeg2", value=0.5 }
@@ -40,6 +53,7 @@ function Pooptorio.on_tick()
 	for k,v in ipairs(Pooptorio.listDump) do
 		v.health = v.health - 3 
 	end
+	update_ui()
 end
 
 function Pooptorio.canThePopeShitInTheWood(player)
