@@ -3,6 +3,10 @@ Pooptorio.character = nil
 Pooptorio.need = 0
 Pooptorio.tick = 0
 Pooptorio.listDump = {}
+Pooptorio.stomache = 1
+Pooptorio.stomacheBar = {}
+Pooptorio.bowel = 1
+Pooptorio.bowelBar = {}
 
 function Pooptorio.on_console_chat(e)
 	local character = game.get_player(e.player_index).character
@@ -19,28 +23,36 @@ function Pooptorio.on_console_chat(e)
 	}
 end
 
-function Pooptorio.update_ui()
-	if game.get_player(1).gui.left["poop"] == nil then
-		game.get_player(1).gui.left.add{type="progressbar", name="poop", value=0}
+function Pooptorio.update_ui(player_index)
+	local ui = game.get_player(player_index).gui.left
+	if ui["pooptorio-stomache-label"] == nil then
+		ui.add{type="label", name="pooptorio-stomache-label", caption="stomache"}
 	end
-	Pooptorio.needBar = game.get_player(1).gui.left["poop"]
+	if ui["pooptorio-stomache"] == nil then
+		ui.add{type="progressbar", name="pooptorio-stomache", value=0}
+	end
+	if ui["pooptorio-bowel-label"] == nil then
+		ui.add{type="label", name="pooptorio-bowel-label", caption="bowel"}
+	end
+	if ui["pooptorio-bowel"] == nil then
+		ui.add{type="progressbar", name="pooptorio-bowel", value=0}
+	end
 
-	Pooptorio.needBar.value = 0.5
+	Pooptorio.stomacheBar = game.get_player(player_index).gui.left["pooptorio-stomache"]
+	Pooptorio.bowelBar = game.get_player(player_index).gui.left["pooptorio-bowel"]
+
+	Pooptorio.stomacheBar.value = Pooptorio.stomache
+	Pooptorio.bowelBar.value = Pooptorio.bowel
 end
 
+function Pooptorio.moveBowel(player_index)
+	
+end
 function Pooptorio.on_tick(player)
 	if player.character then
 		player.character.health = player.character.health - 10.0
-function Pooptorio.update_ui()
-	if game.get_player(1).gui.left["poop"] == nil then
-		game.get_player(1).gui.left.add{type="progressbar", name="poop", value=0}
 	end
-	Pooptorio.needBar = game.get_player(1).gui.left["poop"]
 
-	Pooptorio.needBar.value = 0.5
-end
-
-function Pooptorio.on_tick()
 	if not Pooptorio.character then
 		if game.get_player(1) and game.get_player(1).character then
 			Pooptorio.character = game.get_player(1).character
@@ -52,14 +64,16 @@ function Pooptorio.on_tick()
 		if not Pooptorio.character then
 			return
 		end
-		Pooptorio.character.health = Pooptorio.character.health - 10.0  
+		-- Pooptorio.character.health = Pooptorio.character.health - 10.0  
 		-- time = time + 1
 	end
 
 	for k,v in ipairs(Pooptorio.listDump) do
-		v.health = v.health - 3
+		-- v.health = v.health - 3 
 	end
-	Pooptorio.update_ui()
+
+
+	Pooptorio.update_ui(1)
 end
 
 function Pooptorio.canThePopeShitInTheWood(player)
