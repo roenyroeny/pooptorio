@@ -60,25 +60,8 @@ function Pooptorio.moveBowel(player_index)
 	end
 end
 
-function Pooptorio.on_tick(player)
-	if player.character then
-		player.character.health = player.character.health - 10.0
-	end
-
-	if not Pooptorio.character then
-		if game.get_player(1) and game.get_player(1).character then
-			Pooptorio.character = game.get_player(1).character
-		else
-			game.print("no character")
-			return
-		end
-	else
-		if not Pooptorio.character then
-			return
-		end
-		-- Pooptorio.character.health = Pooptorio.character.health - 10.0  
-		-- time = time + 1
-	end
+function Pooptorio.on_tick(character)
+	character.health = character.health - 10.0
 
 	for k,v in ipairs(Pooptorio.listDump) do
 		-- v.health = v.health - 3 
@@ -88,11 +71,11 @@ function Pooptorio.on_tick(player)
 	Pooptorio.update_ui(1)
 end
 
-function Pooptorio.canThePopeShitInTheWood(player)
+function Pooptorio.canThePopeShitInTheWood(character)
 	local count = 0
-	for _, entity in ipairs(player.surface.find_entities_filtered
+	for _, entity in ipairs(character.surface.find_entities_filtered
 		{ 
-			area = {{player.position.x-3, player.position.y-3}, {player.position.x+3, player.position.y+3}
+			area = {{character.position.x-3, character.position.y-3}, {character.position.x+3, character.position.y+3}
 		},
 		type="tree"}) 
 	do
@@ -115,22 +98,25 @@ function Pooptorio.on_player_respawned()
 end
 
 script.on_event(defines.events.on_player_changed_position,
-  function(event)
-    local player = game.get_player(event.player_index) -- get the player that moved            
-    -- if they're wearing our armor
-      -- create the fire where they're standing
+	function(event)
+		local character = game.get_player(event.player_index).character
+		if not character then
+			return
+		end
 
-      if Pooptorio.canThePopeShitInTheWood(player) then
-      	player.surface.create_entity{name="item-on-ground", position=player.position, stack={name="turd"}}
-      	local poopcount = 1;
-	  end
-  end
+		if Pooptorio.canThePopeShitInTheWood(character) then
+			character.surface.create_entity{name="item-on-ground", position=character.position, stack={name="turd"}}
+			local poopcount = 1;
+		end
+	end
 )
 
 function Pooptorio.main()
 	for k,v in pairs(game.connected_players) do
-		if Pooptorio.tick % 6 == 0 then
-			Pooptorio.on_tick(v)
+		if v.character then 
+			if Pooptorio.tick % 6 == 0 then
+				Pooptorio.on_tick(v.character)
+			end
 		end
 	end
 	Pooptorio.tick = Pooptorio.tick + 1
