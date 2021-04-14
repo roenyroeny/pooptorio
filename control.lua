@@ -32,9 +32,6 @@ function Pooptorio.update_ui()
 end
 
 function Pooptorio.on_tick()
-	if not Pooptorio.poopBar then
-		Pooptorio.poopBar = game.get_player(1).gui.top.add{ type="progressbar", name="greeg2", value=0.5 }
-	end
 	if not Pooptorio.character then
 		if game.get_player(1) and game.get_player(1).character then
 			Pooptorio.character = game.get_player(1).character
