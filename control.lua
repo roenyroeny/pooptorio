@@ -10,9 +10,10 @@ Pooptorio.bowelBar = {}
 Pooptorio.jitter = 0
 
 -- settings
-local CoffeeCraftSpeed = 2
-local CoffeeDigestMultiplier = 2
-local DigestSpeed = 0.1
+PoopSettings = {}
+PoopSettings.coffeeCraftSpeed = nil
+PoopSettings.coffeeDigestMultiplier = nil
+PoopSettings.digestSpeed = nil
 
 function Pooptorio.on_console_chat(e)
 	local character = game.get_player(e.player_index).character
@@ -52,11 +53,12 @@ function Pooptorio.update_ui(player_index)
 end
 
 function Pooptorio.moveBowel(player_index)
-
-	local digest = DigestSpeed
+	local digest = PoopSettings.digestSpeed
 	if Pooptorio.jitter > 0 then
-		digest = DigestSpeed * CoffeeDigestMultiplier -- poop faster after drinking coffee
+		-- poop faster after drinking coffee
+		digest = PoopSettings.digestSpeed * PoopSettings.coffeeDigestMultiplier
 	end
+	
 	Pooptorio.stomache = Pooptorio.stomache - digest;
 	Pooptorio.bowel = Pooptorio.bowel + digest;
 	-- compensate for negative stomache content
@@ -123,7 +125,7 @@ function Pooptorio.on_player_used_capsule(e)
 				character.insert{name="coffee-cup", count=1}
 				if Pooptorio.jitter == 0 then
 					-- craft faster after drinking coffee
-					character.force.manual_crafting_speed_modifier = CoffeeCraftSpeed
+					character.force.manual_crafting_speed_modifier = PoopSettings.coffeeCraftSpeed
 				end
 			end
 			Pooptorio.jitter = Pooptorio.jitter + 1
@@ -149,7 +151,28 @@ script.on_event(defines.events.on_player_changed_position,
 	end
 )
 
+function Pooptorio.on_runtime_mod_setting_changed()
+	local coffeeCraft = settings.global["coffee-craft-speed"].value
+	if coffeeCraft then
+		PoopSettings.coffeeCraftSpeed = coffeeCraft
+	end
+
+	local coffeeDigest = settings.global["coffee-digest-multiplier"].value
+	if coffeeDigest then
+		PoopSettings.coffeeDigestMultiplier = coffeeDigest
+	end
+
+	local digest = settings.global["digest-speed"].value
+	if digest then
+		PoopSettings.digestSpeed = digest
+	end
+end
+
 function Pooptorio.main()
+	if CoffeeCraftSpeed == nil then
+		Pooptorio.on_runtime_mod_setting_changed()
+	end
+
 	for k,v in pairs(game.connected_players) do
 		if v.character then 
 			if Pooptorio.tick % 10 == 0 then
@@ -160,6 +183,7 @@ function Pooptorio.main()
 	Pooptorio.tick = Pooptorio.tick + 1
 end
 
+script.on_event(defines.events.on_runtime_mod_setting_changed, function(event) Pooptorio.on_runtime_mod_setting_changed() end, nil)
 script.on_event(defines.events.on_console_chat, function(event) Pooptorio.on_console_chat(event) end, nil)
 script.on_event(defines.events.on_player_used_capsule, function(event) Pooptorio.on_player_used_capsule(event) end, nil)
 script.on_event(defines.events.on_player_respawned, Pooptorio.on_player_respawned, nil)
