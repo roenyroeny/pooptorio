@@ -1,5 +1,13 @@
 local Skitnoedig = {}
--- balancing variables
+-- Etymology (Swedish)
+-- bajsnödig
+-- From bajs (“poop”) +‎ nödig (“needing”)
+-- Adjective
+-- 1. (colloquial) in need to defecate, having bowel urgency
+
+
+
+ -- balancing variables
 Skitnoedig.pollutionDroppedTurd = 0.25
 Skitnoedig.pollutionTurdInventory = 10.0
 
