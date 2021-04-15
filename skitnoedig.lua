@@ -17,6 +17,7 @@ end
 
 function Skitnoedig.moveBowel(player_index, settings)
 	local digest = settings.digestSpeed
+    local character = game.get_player(player_index).character
 	if settings.jitter > 0 then
 		-- poop faster after drinking coffee
 		digest = settings.digestSpeed * settings.coffeeDigestMultiplier
@@ -29,6 +30,7 @@ function Skitnoedig.moveBowel(player_index, settings)
 		settings.stomache = settings.stomache + settings.bowel;
 
 		--inflict starvation dammage here.
+        character.damage(10.0, "player", "physical", character)
 
 		settings.stomache = 0;
 	end
@@ -47,14 +49,16 @@ function Skitnoedig.canThePopeShitInTheWood(character)
 	return count > 3
 end
 
-function Skitnoedig.on_player_changed_position(e)
+function Skitnoedig.on_player_changed_position(e, pst, ui)
     local character = game.get_player(e.player_index).character
 		if not character then
 			return
 		end
 
-		if Skitnoedig.canThePopeShitInTheWood(character) then
+		if Skitnoedig.canThePopeShitInTheWood(character) and pst[e.player_index].bowel > 0 then
 			character.surface.create_entity{name="item-on-ground", position=character.position, stack={name="turd"}}
+            pst[e.player_index].bowel = pst[e.player_index].bowel - 1
+            ui.update_ui(e.player_index, pst[e.player_index])
 			local poopcount = 1;
 		end
 end
@@ -63,7 +67,7 @@ function Skitnoedig.on_player_used_capsule(e, pst)
 	if e and e.item then
 		if e.item.name == "raw-fish" then 
 			game.print(string.format("Player %s ate %s", e.player_index, e.item.name))
-			pst[e.player_index].need = pst[e.player_index].need + 1
+			pst[e.player_index].stomache = pst[e.player_index].stomache + 1
 		elseif e.item.name == "cup-of-coffee" then
 			game.print(string.format("Player %s drank %s", e.player_index, e.item.name))
 			local character = game.get_player(e.player_index).character
@@ -78,8 +82,5 @@ function Skitnoedig.on_player_used_capsule(e, pst)
 		end
 	end
 end
-
--- Skitnoedig
-script.on_event(defines.events.on_player_changed_position, function(event) Skitnoedig.on_player_changed_position(event) end )
 
 return Skitnoedig

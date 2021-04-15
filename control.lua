@@ -16,28 +16,29 @@ PoopSettings.need = 0
 PoopSettings.listDump = {}
 PoopSettings.stomache = 1
 PoopSettings.stomacheBar = {}
-PoopSettings.bowel = 1
+PoopSettings.bowel = 5
 PoopSettings.bowelBar = {}
 PoopSettings.jitter = 0
 
 local PoopSettingsTable = {}
 function PoopSettingsTable.RegisterPlayer(player_index)
 	if PoopSettingsTable[player_index] == nil then
+		-- store a copy of PoopSettings in this table for every player
 		PoopSettingsTable[player_index] = utils.deepcopy(PoopSettings)
 	end
 end
 
 function Pooptorio.on_tick(character, settings)
 	local player_index = character.player.index
-	character.health = character.health - 10.0
+	-- character.health = character.health - 10.0
 
 	for k,v in ipairs(settings.listDump) do
 		-- v.health = v.health - 3 
 	end
 
-	Skitnoedig.moveBowel(1, settings)
-	poopUI.update_ui(1, settings)
-	Coffee.gottaGoFast(1, settings)
+	Skitnoedig.moveBowel(player_index, settings)
+	poopUI.update_ui(player_index, settings)
+	Coffee.gottaGoFast(player_index, settings)
 end
 
 function Pooptorio.on_runtime_mod_setting_changed()
@@ -85,3 +86,6 @@ script.on_nth_tick(60, function() Pooptorio.main(PoopSettingsTable) end)
 -- Skitnoedig.lua
 script.on_event(defines.events.on_player_used_capsule, function(event) Skitnoedig.on_player_used_capsule(event, PoopSettingsTable) end, nil)
 script.on_event(defines.events.on_console_chat, function(event) Skitnoedig.on_console_chat(event, PoopSettingsTable) end, nil)
+script.on_event(defines.events.on_player_changed_position, function(event) Skitnoedig.on_player_changed_position(event, PoopSettingsTable, poopUI) end )
+
+
