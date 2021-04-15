@@ -1,6 +1,7 @@
 local Coffee = require("coffee")
 local Skitnoedig = require("skitnoedig")
 local poopUI = require("poopUI")
+local utils = require("utils")
 
 -- mod settings
 local Pooptorio = {}
@@ -19,16 +20,24 @@ PoopSettings.bowel = 1
 PoopSettings.bowelBar = {}
 PoopSettings.jitter = 0
 
-function Pooptorio.on_tick(character, poopSettings)
+local PoopSettingsTable = {}
+function PoopSettingsTable.RegisterPlayer(player_index)
+	if PoopSettingsTable[player_index] == nil then
+		PoopSettingsTable[player_index] = utils.deepcopy(PoopSettings)
+	end
+end
+
+function Pooptorio.on_tick(character, pst)
+	local player_index = character.player.index
 	character.health = character.health - 10.0
 
-	for k,v in ipairs(PoopSettings.listDump) do
+	for k,v in ipairs(pst[player_index].listDump) do
 		-- v.health = v.health - 3 
 	end
 
-	Skitnoedig.moveBowel(1, poopSettings)
-	poopUI.update_ui(1, poopSettings)
-	Coffee.gottaGoFast(1, poopSettings)
+	Skitnoedig.moveBowel(1, pst)
+	poopUI.update_ui(1, pst)
+	Coffee.gottaGoFast(1, pst)
 end
 
 function Pooptorio.on_runtime_mod_setting_changed()
@@ -48,7 +57,7 @@ function Pooptorio.on_runtime_mod_setting_changed()
 	end
 end
 
-function Pooptorio.main()
+function Pooptorio.main(pst)
 	if CoffeeCraftSpeed == nil then
 		Pooptorio.on_runtime_mod_setting_changed()
 	end
@@ -56,7 +65,11 @@ function Pooptorio.main()
 	for k,v in pairs(game.connected_players) do
 		if v.character then 
 			if Pooptorio.tick % 10 == 0 then
-				Pooptorio.on_tick(v.character, PoopSettings)
+				if not pst[v.index] then
+					pst.RegisterPlayer(v.index)
+				end
+
+				Pooptorio.on_tick(v.character, pst)
 			end
 		end
 	end
@@ -64,9 +77,11 @@ function Pooptorio.main()
 end
 
 -- Pooptorio.lua
+script.on_event(defines.events.on_player_joined_game, function(event) PoopSettingsTable.RegisterPlayer(event.player_index) end, nil)
 script.on_event(defines.events.on_runtime_mod_setting_changed, function(event) Pooptorio.on_runtime_mod_setting_changed() end, nil)
-script.on_nth_tick(60, Pooptorio.main)
+script.on_nth_tick(60, function() Pooptorio.main(PoopSettingsTable) end)
+
 
 -- Skitnoedig.lua
-script.on_event(defines.events.on_player_used_capsule, function(event) Skitnoedig.on_player_used_capsule(event, PoopSettings) end, nil)
-script.on_event(defines.events.on_console_chat, function(event) Skitnoedig.on_console_chat(event, PoopSettings) end, nil)
+script.on_event(defines.events.on_player_used_capsule, function(event) Skitnoedig.on_player_used_capsule(event, PoopSettingsTable) end, nil)
+script.on_event(defines.events.on_console_chat, function(event) Skitnoedig.on_console_chat(event, PoopSettingsTable) end, nil)
