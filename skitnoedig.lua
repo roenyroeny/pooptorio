@@ -15,22 +15,22 @@ function Skitnoedig.on_console_chat(e, pst)
 	}
 end
 
-function Skitnoedig.moveBowel(player_index, pst)
-	local digest = pst[player_index].digestSpeed
-	if pst[player_index].jitter > 0 then
+function Skitnoedig.moveBowel(player_index, settings)
+	local digest = settings.digestSpeed
+	if settings.jitter > 0 then
 		-- poop faster after drinking coffee
-		digest = pst[player_index].digestSpeed * pst[player_index].coffeeDigestMultiplier
+		digest = settings.digestSpeed * settings.coffeeDigestMultiplier
 	end
 	
-	pst[player_index].stomache = pst[player_index].stomache - digest;
-	pst[player_index].bowel = pst[player_index].bowel + digest;
+	settings.stomache = settings.stomache - digest;
+	settings.bowel = settings.bowel + digest;
 	-- compensate for negative stomache content
-	if pst[player_index].stomache < 0 then
-		pst[player_index].stomache = pst[player_index].stomache + pst[player_index].bowel;
+	if settings.stomache < 0 then
+		settings.stomache = settings.stomache + settings.bowel;
 
 		--inflict starvation dammage here.
 
-		pst[player_index].stomache = 0;
+		settings.stomache = 0;
 	end
 end
 

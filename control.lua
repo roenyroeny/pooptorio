@@ -27,17 +27,17 @@ function PoopSettingsTable.RegisterPlayer(player_index)
 	end
 end
 
-function Pooptorio.on_tick(character, pst)
+function Pooptorio.on_tick(character, settings)
 	local player_index = character.player.index
 	character.health = character.health - 10.0
 
-	for k,v in ipairs(pst[player_index].listDump) do
+	for k,v in ipairs(settings.listDump) do
 		-- v.health = v.health - 3 
 	end
 
-	Skitnoedig.moveBowel(1, pst)
-	poopUI.update_ui(1, pst)
-	Coffee.gottaGoFast(1, pst)
+	Skitnoedig.moveBowel(1, settings)
+	poopUI.update_ui(1, settings)
+	Coffee.gottaGoFast(1, settings)
 end
 
 function Pooptorio.on_runtime_mod_setting_changed()
@@ -69,7 +69,7 @@ function Pooptorio.main(pst)
 					pst.RegisterPlayer(v.index)
 				end
 
-				Pooptorio.on_tick(v.character, pst)
+				Pooptorio.on_tick(v.character, pst[v.index])
 			end
 		end
 	end

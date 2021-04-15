@@ -1,12 +1,12 @@
 local Coffee = {}
 
-function Coffee.gottaGoFast(player_index, pst)
-	if pst[player_index].jitter == 0 then
+function Coffee.gottaGoFast(player_index, settings)
+	if settings.jitter == 0 then
 		return
 	end
 
-	pst[player_index].jitter = pst[player_index].jitter - 1
-	if pst[player_index].jitter == 0 then
+	settings.jitter = settings.jitter - 1
+	if settings.jitter == 0 then
 		game.print(string.format("Player %s's coffee wore out", player_index))
 
 		-- craft faster after drinking coffee
