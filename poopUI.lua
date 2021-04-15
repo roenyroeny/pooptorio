@@ -18,8 +18,8 @@ function PoopUI.update_ui(player_index, settings)
 	settings.stomacheBar = game.get_player(player_index).gui.left["pooptorio-stomache"]
 	settings.bowelBar = game.get_player(player_index).gui.left["pooptorio-bowel"]
 
-	settings.stomacheBar.value = settings.stomache
-	settings.bowelBar.value = settings.bowel
+	settings.stomacheBar.value = 1 - (settings.stomache / settings.stomacheFull)
+	settings.bowelBar.value = settings.bowel / settings.bowelFull
 end
 
 return PoopUI

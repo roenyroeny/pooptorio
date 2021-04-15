@@ -15,8 +15,10 @@ PoopSettings.digestSpeed = nil
 PoopSettings.need = 0
 PoopSettings.listDump = {}
 PoopSettings.stomache = 1
+PoopSettings.stomacheFull = 5
 PoopSettings.stomacheBar = {}
 PoopSettings.bowel = 5
+PoopSettings.bowelFull = 6
 PoopSettings.bowelBar = {}
 PoopSettings.jitter = 0
 
@@ -84,7 +86,7 @@ script.on_nth_tick(60, function() Pooptorio.main(PoopSettingsTable) end)
 
 
 -- Skitnoedig.lua
-script.on_event(defines.events.on_player_used_capsule, function(event) Skitnoedig.on_player_used_capsule(event, PoopSettingsTable) end, nil)
+script.on_event(defines.events.on_player_used_capsule, function(event) Skitnoedig.on_player_used_capsule(event, PoopSettingsTable, poopUI) end, nil)
 script.on_event(defines.events.on_console_chat, function(event) Skitnoedig.on_console_chat(event, PoopSettingsTable) end, nil)
 script.on_event(defines.events.on_player_changed_position, function(event) Skitnoedig.on_player_changed_position(event, PoopSettingsTable, poopUI) end )
 
