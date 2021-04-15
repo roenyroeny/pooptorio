@@ -1,18 +1,41 @@
 local Skitnoedig = {}
+-- balancing variables
+Skitnoedig.pollutionDroppedTurd = 0.25
+Skitnoedig.pollutionTurdInventory = 10.0
 
 function Skitnoedig.on_console_chat(e, pst)
 	local character = game.get_player(e.player_index).character
 	if not character then return end
 
-	character.health = character.health * ( 1 / character.get_health_ratio()) / character.get_health_ratio()
-	table.insert(pst[e.player_index].listDump, character.surface.create_entity{
-		name = "dead-dry-hairy-tree",
-		position = character.position,
-	})
+	-- character.health = character.health * ( 1 / character.get_health_ratio()) / character.get_health_ratio()
+	--table.insert(pst[e.player_index].listDump, character.surface.create_entity{
+	--	name = "dead-dry-hairy-tree",
+	--	position = character.position,
+	--})
 	character.surface.create_entity{
 		name = "acid-splash-fire-spitter-medium",
 		position = character.position,
 	}
+end
+
+function Skitnoedig.Pollute(player_index, pooptorio)
+	local player = game.get_player(player_index)
+	if not player.get_main_inventory() then return end
+	local inventoryDict = player.get_main_inventory().get_contents()
+
+	-- pollute 10n amount, where n is the amount of turds in the player's inventory
+	if inventoryDict["turd"] then 
+		player.surface.pollute(player.position, Skitnoedig.pollutionTurdInventory * inventoryDict["turd"])
+	end
+
+	-- pollution for all the turds in the wild
+	for k, v in pairs(pooptorio.droppedTurds) do 
+		if v then 
+			v.surface.pollute(
+				v.position,
+				Skitnoedig.pollutionDroppedTurd)
+		end
+	end
 end
 
 function Skitnoedig.moveBowel(player_index, settings)
@@ -49,14 +72,14 @@ function Skitnoedig.canThePopeShitInTheWood(character)
 	return count > 3
 end
 
-function Skitnoedig.on_player_changed_position(e, pst, ui)
+function Skitnoedig.on_player_changed_position(e, pooptorio, pst, ui)
     local character = game.get_player(e.player_index).character
     if not character then
         return
     end
 
     if Skitnoedig.canThePopeShitInTheWood(character) and pst[e.player_index].bowel > 0 then
-        character.surface.create_entity{name="item-on-ground", position=character.position, stack={name="turd"}}
+        table.insert(pooptorio.droppedTurds, character.surface.create_entity{name="item-on-ground", position=character.position, stack={name="turd"}})
         pst[e.player_index].bowel = pst[e.player_index].bowel - 1
         ui.update_ui(e.player_index, pst[e.player_index])
     end
