@@ -7,6 +7,12 @@ Pooptorio.stomache = 1
 Pooptorio.stomacheBar = {}
 Pooptorio.bowel = 1
 Pooptorio.bowelBar = {}
+Pooptorio.jitter = 0
+
+-- settings
+local CoffeeCraftSpeed = 2
+local CoffeeDigestMultiplier = 2
+local DigestSpeed = 0.1
 
 function Pooptorio.on_console_chat(e)
 	local character = game.get_player(e.player_index).character
@@ -47,7 +53,10 @@ end
 
 function Pooptorio.moveBowel(player_index)
 
-	local digest = 0.1
+	local digest = DigestSpeed
+	if Pooptorio.jitter > 0 then
+		digest = DigestSpeed * CoffeeDigestMultiplier -- poop faster after drinking coffee
+	end
 	Pooptorio.stomache = Pooptorio.stomache - digest;
 	Pooptorio.bowel = Pooptorio.bowel + digest;
 	-- compensate for negative stomache content
@@ -60,6 +69,23 @@ function Pooptorio.moveBowel(player_index)
 	end
 end
 
+function Pooptorio.gottaGoFast(player_index)
+	if Pooptorio.jitter == 0 then
+		return
+	end
+
+	Pooptorio.jitter = Pooptorio.jitter - 1
+	if Pooptorio.jitter == 0 then
+		game.print(string.format("Player %s's coffee wore out", player_index))
+
+		-- craft faster after drinking coffee
+		local character = game.get_player(player_index).character
+		if character then
+			character.force.manual_crafting_speed_modifier = 1
+		end
+	end
+end
+
 function Pooptorio.on_tick(character)
 	character.health = character.health - 10.0
 
@@ -69,6 +95,7 @@ function Pooptorio.on_tick(character)
 
 	Pooptorio.moveBowel(1)
 	Pooptorio.update_ui(1)
+	Pooptorio.gottaGoFast(1)
 end
 
 function Pooptorio.canThePopeShitInTheWood(character)
@@ -89,6 +116,17 @@ function Pooptorio.on_player_used_capsule(e)
 		if e.item.name == "raw-fish" then 
 			game.print(string.format("Player %s ate %s", e.player_index, e.item.name))
 			Pooptorio.need = Pooptorio.need + 1
+		elseif e.item.name == "cup-of-coffee" then
+			game.print(string.format("Player %s drank %s", e.player_index, e.item.name))
+			local character = game.get_player(e.player_index).character
+			if character then
+				character.insert{name="coffee-cup", count=1}
+				if Pooptorio.jitter == 0 then
+					-- craft faster after drinking coffee
+					character.force.manual_crafting_speed_modifier = CoffeeCraftSpeed
+				end
+			end
+			Pooptorio.jitter = Pooptorio.jitter + 1
 		end
 	end
 end
@@ -114,7 +152,7 @@ script.on_event(defines.events.on_player_changed_position,
 function Pooptorio.main()
 	for k,v in pairs(game.connected_players) do
 		if v.character then 
-			if Pooptorio.tick % 6 == 0 then
+			if Pooptorio.tick % 10 == 0 then
 				Pooptorio.on_tick(v.character)
 			end
 		end
@@ -125,4 +163,4 @@ end
 script.on_event(defines.events.on_console_chat, function(event) Pooptorio.on_console_chat(event) end, nil)
 script.on_event(defines.events.on_player_used_capsule, function(event) Pooptorio.on_player_used_capsule(event) end, nil)
 script.on_event(defines.events.on_player_respawned, Pooptorio.on_player_respawned, nil)
-script.on_nth_tick(100, Pooptorio.main)
+script.on_nth_tick(60, Pooptorio.main)
